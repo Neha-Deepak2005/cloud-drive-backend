@@ -2,8 +2,9 @@
 
 A production-shaped backend for a Google-Drive-style file storage & sharing service. Built with **FastAPI + SQLAlchemy + PostgreSQL (Supabase) + JWT auth + Google OAuth**, matching the project's technical specification.
 
-Live API: `<ADD_YOUR_RENDER_URL_HERE>`
-Frontend repo: `<ADD_LINK_TO_FRONTEND_REPO_HERE>`
+Live API: [`https://cloud-drive-backend-5at6.onrender.com`](https://cloud-drive-backend-5at6.onrender.com) (interactive docs at `/docs`)
+Frontend repo: [cloud-drive-frontend](https://github.com/Neha-Deepak2005/cloud-drive-frontend)
+Live app: [`https://cloud-drive-frontend-umber.vercel.app`](https://cloud-drive-frontend-umber.vercel.app)
 
 ## Features
 

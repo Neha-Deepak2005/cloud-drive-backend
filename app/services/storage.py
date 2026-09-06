@@ -85,6 +85,7 @@ class SupabaseS3Storage(BaseStorage):
 
     def __init__(self):
         import boto3
+        from botocore.config import Config
 
         self.bucket = settings.SUPABASE_STORAGE_BUCKET
         self.client = boto3.client(
@@ -93,6 +94,12 @@ class SupabaseS3Storage(BaseStorage):
             region_name=settings.SUPABASE_S3_REGION,
             aws_access_key_id=settings.SUPABASE_S3_ACCESS_KEY_ID,
             aws_secret_access_key=settings.SUPABASE_S3_SECRET_ACCESS_KEY,
+            # Supabase's S3-compatible endpoint requires path-style requests
+            # (https://<endpoint>/<bucket>/<key>) rather than boto3's default
+            # virtual-hosted style (https://<bucket>.<endpoint>/<key>), which
+            # doesn't resolve for Supabase's host and breaks presigned-URL
+            # signatures (surfaces as a 403 on the client's PUT/GET).
+            config=Config(s3={"addressing_style": "path"}, signature_version="s3v4"),
         )
 
     def build_upload_target(self, storage_key: str, mime_type: str) -> dict:
