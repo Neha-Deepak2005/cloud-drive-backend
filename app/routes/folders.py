@@ -116,12 +116,16 @@ def update_folder(
     ensure_access(db, user, "folder", folder_id, min_role="editor")
     folder = db.get(Folder, folder_id)
 
-    if payload.parent_id is not None and payload.parent_id != folder.parent_id:
+    # Use model_fields_set (not "is not None") so moving a folder back to the
+    # root (an explicit parent_id: null in the request body) actually takes
+    # effect — "is not None" made root moves indistinguishable from "field
+    # omitted" and silently did nothing.
+    if "parent_id" in payload.model_fields_set and payload.parent_id != folder.parent_id:
         if payload.parent_id == folder.id or _is_self_or_descendant(db, folder.id, payload.parent_id):
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot move a folder into itself or its descendant")
         if payload.parent_id:
             ensure_access(db, user, "folder", payload.parent_id, min_role="editor")
-        folder.parent_id = payload.parent_id or None
+        folder.parent_id = payload.parent_id
 
     if payload.name is not None:
         folder.name = payload.name

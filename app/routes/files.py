@@ -177,10 +177,14 @@ def update_file(file_id: str, payload: FileUpdate, user: User = Depends(get_curr
     ensure_access(db, user, "file", file_id, min_role="editor")
     file = db.get(File, file_id)
 
-    if payload.folder_id is not None and payload.folder_id != file.folder_id:
+    # Use model_fields_set (not "is not None") so moving a file back to the
+    # root (an explicit folder_id: null in the request body) actually takes
+    # effect — "is not None" made root moves indistinguishable from "field
+    # omitted" and silently did nothing.
+    if "folder_id" in payload.model_fields_set and payload.folder_id != file.folder_id:
         if payload.folder_id:
             ensure_access(db, user, "folder", payload.folder_id, min_role="editor")
-        file.folder_id = payload.folder_id or None
+        file.folder_id = payload.folder_id
     if payload.name is not None:
         file.name = payload.name
 
